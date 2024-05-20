@@ -1,0 +1,19 @@
+.synth-keys {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+  }
+  
+  .synth-keys button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .synth-keys button:hover {
+    background-color: #0056b3;
+  }
+  
