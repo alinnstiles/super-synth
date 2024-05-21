@@ -1,13 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
-
 import NavBar from './NavBar'; // Importing NavBar component
-//import './SynthKeys.css'; // Uncomment this line if you have a CSS file for SynthKeys
+//import './SynthKeys.css'; // Importing CSS for SynthKeys
 import './NavBar.css'; // Importing CSS for NavBar
-
-import NavBar from './NavBar'
-import './SynthKeys.css';
-import './NavBar.css';
-
 
 const SynthKeys = () => {
   // State and refs initialization
@@ -83,16 +77,9 @@ const SynthKeys = () => {
   // JSX structure
   return (
     <div className="synth-keys">
-
       <NavBar /> {/* Rendering NavBar component */}
-      <select value={selectedInstrument} onChange={handleInstrumentChange}> {/* Dropdown to select instrument */}
-
-    
-    <div>
-    <NavBar />
       {/* Dropdown for selecting instrument */}
       <select value={selectedInstrument} onChange={handleInstrumentChange}>
-
         <option value="sine">Sine Wave</option>
         <option value="square">Square Wave</option>
         <option value="triangle">Triangle Wave</option>
@@ -112,7 +99,6 @@ const SynthKeys = () => {
       <button onClick={stopRecording}>Stop Recording</button> {/* Button to stop recording */}
       <input type="range" min="50" max="100" defaultValue="50" onChange={(e) => console.log(e.target.value)} /> {/* Slider for synth length */}
     </div>
-    </div>  
   );
 };
 
