@@ -4,7 +4,7 @@ function CommunitySounds() {
   return (
     <div>
       <NavBar />
-    <h2>Community Recordings</h2>
+    <h2>Community Sounds</h2>
     </div>
   );
 }

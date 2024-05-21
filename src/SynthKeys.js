@@ -1,4 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
+import NavBar from './NavBar'
+import './SynthKeys.css';
+import './NavBar.css';
 
 const SynthKeys = () => {
   const [selectedInstrument, setSelectedInstrument] = useState('sine'); // State to hold the selected instrument
@@ -61,6 +64,9 @@ const SynthKeys = () => {
 
   return (
     <div className="synth-keys">
+    
+    <div>
+    <NavBar />
       {/* Dropdown for selecting instrument */}
       <select value={selectedInstrument} onChange={handleInstrumentChange}>
         <option value="sine">Sine Wave</option>
@@ -79,6 +85,7 @@ const SynthKeys = () => {
       <button onClick={() => playSound(880)}>C5</button>
       <button onClick={stopSound}>Stop</button>
     </div>
+    </div>  
   );
 };
 
