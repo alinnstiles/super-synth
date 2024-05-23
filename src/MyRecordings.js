@@ -26,7 +26,7 @@ const MyRecordings = ({ recordedChunks: propRecordedChunks }) => {
   }
 
   return (
-    <div>
+    <div className="App">
       <NavBar />
       <h2>My Recordings</h2>
       {recordedChunks.map((blob, index) => (
