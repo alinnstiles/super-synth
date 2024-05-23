@@ -1,4 +1,5 @@
 import React from 'react';
+import NavBar from './NavBar';
 
 const MyRecordings = ({ recordedChunks: propRecordedChunks }) => {
   const [loading, setLoading] = React.useState(true);
@@ -26,6 +27,7 @@ const MyRecordings = ({ recordedChunks: propRecordedChunks }) => {
 
   return (
     <div>
+      <NavBar />
       <h2>My Recordings</h2>
       {recordedChunks.map((blob, index) => (
         <div key={index}>
