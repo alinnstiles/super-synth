@@ -5,19 +5,19 @@ import './NavBar.css';
 const SynthKeys = () => {
   const [selectedInstrument, setSelectedInstrument] = useState('sine');
   const synthRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false); // New state to track playing status
+  const [isPlaying, setIsPlaying] = useState(false); //state to track playing status
 
-  const playSound = (note, start = true) => {
+  const playSound = (note, instrument, start = true) => { // Pass instrument as an argument
     const synth = synthRef.current || (synthRef.current = new AudioContext());
     const oscillator = synth.createOscillator();
-    oscillator.type = selectedInstrument;
+    oscillator.type = instrument; // Use instrument passed as argument
     oscillator.frequency.value = note;
     oscillator.connect(synth.destination);
-  
+
     oscillator.onended = () => {
       setIsPlaying(false); // Reset playing state when stopping
     };
-  
+
     if (start) {
       oscillator.start();
       setIsPlaying(true); // Set playing to true when starting
@@ -28,20 +28,20 @@ const SynthKeys = () => {
       }
     }
   };
-  
+
   const handleInstrumentChange = (event) => {
     setSelectedInstrument(event.target.value);
   };
 
   const keyActions = {
-    '1': () => playSound(440),
-    '2': () => playSound(493.88),
-    '3': () => playSound(523.25),
-    '4': () => playSound(587.33),
-    '5': () => playSound(659.25),
-    '6': () => playSound(698.46),
-    '7': () => playSound(783.99),
-    '8': () => playSound(880),
+    '1': () => playSound(440, selectedInstrument), // Pass selectedInstrument
+    '2': () => playSound(493.88, selectedInstrument),
+    '3': () => playSound(523.25, selectedInstrument),
+    '4': () => playSound(587.33, selectedInstrument),
+    '5': () => playSound(659.25, selectedInstrument),
+    '6': () => playSound(698.46, selectedInstrument),
+    '7': () => playSound(783.99, selectedInstrument),
+    '8': () => playSound(880, selectedInstrument),
   };
 
   useEffect(() => {
@@ -59,13 +59,13 @@ const SynthKeys = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [keyActions]); // Added keyActions to dependency array
 
   return (
     <div className="synth-keys">
       {/* Render NavBar component */}
       <NavBar />
-      
+
       {/* Dropdown to select instrument */}
       <select value={selectedInstrument} onChange={handleInstrumentChange}>
         <option value="sine">Sine Wave</option>
@@ -73,15 +73,15 @@ const SynthKeys = () => {
         <option value="triangle">Triangle Wave</option>
         <option value="sawtooth">Sawtooth Wave</option>
       </select>
-      
+
       {/* Buttons for playing notes */}
       {Object.entries(keyActions).map(([key, action]) => (
         <button key={key} onClick={action}>{key}</button>
       ))}
-      
+
       {/* Button to stop playing */}
-      <button onClick={() => playSound(440, false)}>Stop</button>
-      
+      <button onClick={() => playSound(440, selectedInstrument, false)}>Stop</button>
+
       {/* Input range for volume control */}
       <input type="range" min="50" max="100" defaultValue="50" onChange={(e) => console.log(e.target.value)} />
     </div>
