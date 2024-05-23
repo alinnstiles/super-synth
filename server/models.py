@@ -19,18 +19,21 @@ class User(db.Model, SerializerMixin):
     username = db.Column(db.String, nullable=False, unique=True)
     _hashed_password = db.Column(db.String)
     recordings = db.relationship('Recording', back_populates='user')
-    comments = db.relationship('Comment', 'user')
+    comments = db.relationship('Comment', back_populates='user')
     
     serialize_rules = ['-recordings.comments', '-recordings.user', '-comments']
     
     def __repr__(self):
         return f'User(username={self.username})'
     
-    @validates('username')
-    def validate_user(self, key, value):
-        updated_value = value.strip().replace(' ', '_')
-        if updated_value.length() > 4:
-            return updated_value
+    # TODO Add validations
+    # @validates('username')
+    # def validate_user(self, key, value):
+    #     updated_value = value.strip().replace(' ', '_')
+    #     if updated_value.length() > 4:
+    #         return updated_value
+    
+    # TODO Add Authentication
 
 class Recording(db.Model, SerializerMixin):
     
@@ -64,7 +67,7 @@ class Comment(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
     
     recording = db.relationship('Recording', back_populates='comments')
-    user = db.relationship('User', 'comments')
+    user = db.relationship('User', back_populates='comments')
     
     serialize_rules = ['-recording.comments', '-user.comments']
     

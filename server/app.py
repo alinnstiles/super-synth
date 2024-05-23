@@ -5,17 +5,21 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 
-from models import db, User
+
+from models import db, User, Recording, Comment
 
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
+
+# Add validations
 
 CORS(app)
 
