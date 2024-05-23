@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import SynthKeys from './SynthKeys';
-// import MyRecordings from './MyRecordings';
-// import CommunitySounds from './CommunitySounds';
 import NavBar from './NavBar';
-import Home from './Home';
+import MyRecordings from './MyRecordings';
 
-function App() {
+const App = () => {
+  const [recordedChunks, setRecordedChunks] = useState([]);
+
   return (
     <div className="App">
       <h1>Synth Keys</h1>
-      <SynthKeys />
       <NavBar />
+      <SynthKeys setRecordedChunks={setRecordedChunks} />
+      <MyRecordings recordedChunks={recordedChunks} />
     </div>
   );
-}
+};
 
 export default App;
