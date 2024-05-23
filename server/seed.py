@@ -13,19 +13,6 @@ if __name__ == '__main__':
 
         User.query.delete()
         
-        users = []
-        
-        for _ in range(0,5):
-            u1 = User(
-                username = faker.name()
-            )
-            users.append(u1)
-        
-        db.session.add_all(users)
-        db.session.commit()
-        
-        # TODO Recording seed
-        
         recordings = []
         
         for _ in range(0,5):
@@ -41,7 +28,6 @@ if __name__ == '__main__':
         db.session.add_all(recordings)
         db.session.commit()
         
-        # TODO Comment seed
         comment = []
         
         for _ in range(0,5):
