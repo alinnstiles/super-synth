@@ -1,13 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import NavBar from './NavBar'
 import { useState, useEffect } from 'react'
-// import Login from './UserPanel/Login'
-// import Signup from './UserPanel/Signup'
-// import UserDetails from './UserPanel/UserDetails'
-// import Index from './UserPanel/Index'
 import UserPanel from './UserPanel'
-
-
 
 function Home() {
 
