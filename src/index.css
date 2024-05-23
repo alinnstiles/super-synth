@@ -41,6 +41,10 @@ code {
   margin-top: 0.5em;
 }
 
+.user-form input[type="text"] {
+  color: white;
+}
+
 .user-form input[type="submit"] {
   background-color: white;
   border: solid grey 2px;
