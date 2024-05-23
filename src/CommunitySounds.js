@@ -13,7 +13,7 @@ function CommunitySounds() {
   
 
   return (
-    <div>
+    <div className="App">
       <NavBar />
       <h2>Community Sounds</h2>
       {publicRecordings.map((recording, index) => (

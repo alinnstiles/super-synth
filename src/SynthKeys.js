@@ -127,7 +127,7 @@ const SynthKeys = () => {
   };
 
   return (
-    <div className="synth-keys">
+    <div className="App">
       <NavBar />
       <select value={selectedInstrument} onChange={handleInstrumentChange}>
         <option value="sine">Sine Wave</option>
