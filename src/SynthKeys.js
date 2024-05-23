@@ -75,3 +75,4 @@ const SynthKeys = () => {
 };
 
 export default SynthKeys;
+
