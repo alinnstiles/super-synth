@@ -70,6 +70,18 @@ def logout():
     return {}, 204
 
 # write your routes here!
+#fetch both public and private recordings
+
+@app.route('/api/user-recordings', methods=['GET'])
+def get_user_recordings():
+    user_id = session.get('user_id')
+    if not user_id:
+        return {"error": "Not logged in"}, 401
+
+    recordings = Recording.query.filter_by(user_id=user_id).all()
+    return jsonify([recording.to_dict() for recording in recordings]), 200
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
