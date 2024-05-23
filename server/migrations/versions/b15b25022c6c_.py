@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 60822c2b2881
+Revision ID: b15b25022c6c
 Revises: 
-Create Date: 2024-05-20 13:12:49.176263
+Create Date: 2024-05-23 11:56:38.767089
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '60822c2b2881'
+revision = 'b15b25022c6c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,6 +21,7 @@ def upgrade():
     op.create_table('users_table',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
+    sa.Column('_hashed_password', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
@@ -37,12 +38,13 @@ def upgrade():
     )
     op.create_table('comments_table',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user', sa.String(), nullable=False),
     sa.Column('comment', sa.String(), nullable=False),
     sa.Column('likes', sa.Integer(), nullable=True),
     sa.Column('time_created', sa.DateTime(), nullable=True),
     sa.Column('recording_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['recording_id'], ['recordings_table.id'], name=op.f('fk_comments_table_recording_id_recordings_table')),
+    sa.ForeignKeyConstraint(['user_id'], ['users_table.id'], name=op.f('fk_comments_table_user_id_users_table')),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
