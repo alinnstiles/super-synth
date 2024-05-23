@@ -49,17 +49,19 @@ const SynthKeys = () => {
       if (!isNaN(event.key)) {
         const action = keyActions[event.key];
         if (action) {
+          setSelectedInstrument(event.target.value); // Update selectedInstrument state
           action();
         }
       }
     };
-
+  
     window.addEventListener('keydown', handleKeyDown);
-
+  
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [selectedInstrument]); // Include selectedInstrument in the dependency array
+  
 
   return (
     <div className="synth-keys">
