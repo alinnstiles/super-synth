@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
-from flask import Flask, request
+from flask_bcrypt import Bcrypt
+from flask import Flask, jsonify, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -44,7 +45,7 @@ def create_user():
     except Exception as e:
         return { 'error': str(e) }, 406
 
-@app.get(URL_prEFIX + '/check-session')
+@app.get(URL_PREFIX + '/check-session')
 def check_session():
     user = User.query.where(User.id == session['user_id']).first()
     if user:
