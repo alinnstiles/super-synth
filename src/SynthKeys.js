@@ -1,11 +1,84 @@
 import React, { useRef, useEffect, useState } from 'react';
 import NavBar from './NavBar';
 import './NavBar.css';
+import axios from 'axios';
 
 const SynthKeys = () => {
   const [selectedInstrument, setSelectedInstrument] = useState('sine');
   const synthRef = useRef(null);
   const [activeOscillators, setActiveOscillators] = useState(new Map());
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedChunks, setRecordedChunks] = useState([]);
+  const [privacySetting, setPrivacySetting] = useState('private');
+  const handleKeyDown = (event) => {
+    // Example action: Play a sound when a key is pressed
+    const action = keyActions[event.key];
+    if (action) {
+      action();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []); 
+
+  let mediaRecorder;
+  let audioChunks = [];
+
+  const startRecording = () => {
+    audioChunks = [];
+    setIsRecording(true);
+    navigator.mediaDevices.getUserMedia({ audio: true })
+     .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => {
+          audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          setRecordedChunks(prevChunks => [...prevChunks, audioBlob]);
+          audioChunks = [];
+        };
+        mediaRecorder.start();
+      })
+     .catch(err => console.error('Error recording:', err));
+  };
+
+  const stopRecording = async () => {
+    if (mediaRecorder) {
+      setIsRecording(false);
+      mediaRecorder.stop();
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'recording.wav');
+      try {
+        const response = await axios.post('/upload-recording', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log(response.data.message);
+      } catch (error) {
+        console.error('Failed to upload recording:', error);
+      }
+      audioChunks = [];
+    }
+  };
+
+  const playRecording = () => {
+    if (recordedChunks.length === 0) {
+      console.log("No recordings available.");
+      return;
+    }
+    const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+    const audioURL = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioURL);
+    audio.play();
+  };
 
   const playSound = (note, instrument) => {
     const synth = synthRef.current || (synthRef.current = new AudioContext());
@@ -13,9 +86,7 @@ const SynthKeys = () => {
     oscillator.type = instrument;
     oscillator.frequency.value = note;
     oscillator.connect(synth.destination);
-
     setActiveOscillators(prevState => new Map(prevState).set(note, oscillator));
-
     oscillator.start();
   };
 
@@ -30,20 +101,12 @@ const SynthKeys = () => {
     setSelectedInstrument(event.target.value);
   };
 
-  const handleKeyDown = (event) => {
-    const action = keyActions[event.key];
-    if (action) {
-      action();
-    }
-  };
-
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []); // Empty dependency array to run only once
+  }, []);
 
   const keyActions = {
     '1': () => playSound(440, selectedInstrument),
@@ -54,6 +117,13 @@ const SynthKeys = () => {
     '6': () => playSound(698.46, selectedInstrument),
     '7': () => playSound(783.99, selectedInstrument),
     '8': () => playSound(880, selectedInstrument),
+    'r': () => {
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    }
   };
 
   return (
@@ -69,10 +139,10 @@ const SynthKeys = () => {
         <button key={key} onClick={action}>{key}</button>
       ))}
       <button onClick={stopAllSounds}>Stop</button>
-      <input type="range" min="50" max="100" defaultValue="50" onChange={(e) => console.log(e.target.value)} />
+      <button onClick={playRecording}>Play Recording</button>
+      {isRecording? <button onClick={stopRecording}>Stop Recording</button> : <button onClick={startRecording}>Start Recording</button>}
     </div>
   );
 };
 
 export default SynthKeys;
-
