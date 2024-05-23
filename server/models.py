@@ -17,7 +17,7 @@ class User(db.Model, SerializerMixin):
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
-    
+    _hashed_password = db.Column(db.String)
     recordings = db.relationship('Recording', back_populates='user')
     comments = db.relationship('Comment', back_populates='user')
     
