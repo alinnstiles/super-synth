@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: url('/Users/Stephin/Desktop/Development/code/phase-4/super-synth/public/Super Synth Logo.jpg');
 }
 
 code {
@@ -14,6 +15,7 @@ code {
 .App {
   text-align: center;
 }
+
 
 .user-form {
   background-color: lightblue;
