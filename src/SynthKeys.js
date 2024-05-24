@@ -9,25 +9,13 @@ const SynthKeys = () => {
   const [activeOscillators, setActiveOscillators] = useState(new Map());
   const [isRecording, setIsRecording] = useState(false);
   const [recordedChunks, setRecordedChunks] = useState([]);
-  const [privacySetting, setPrivacySetting] = useState('private');
-  const handleKeyDown = (event) => {
-    // Example action: Play a sound when a key is pressed
-    const action = keyActions[event.key];
-    if (action) {
-      action();
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []); 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0); // State to hold the duration of the recorded audio
 
   let mediaRecorder;
   let audioChunks = [];
+  let audioPlayer = useRef(null); // Reference to the audio player
 
   const startRecording = () => {
     audioChunks = [];
@@ -76,8 +64,22 @@ const SynthKeys = () => {
     }
     const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
     const audioURL = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioURL);
-    audio.play();
+    audioPlayer.current.src = audioURL;
+    audioPlayer.current.play();
+    setIsPlaying(true);
+  };
+
+  const pauseRecording = () => {
+    setIsPlaying(false);
+    audioPlayer.current.pause();
+  };
+
+  const handleTimeUpdate = () => {
+    setCurrentTime(audioPlayer.current.currentTime);
+  };
+
+  const handleDurationChange = () => {
+    setDuration(audioPlayer.current.duration);
   };
 
   const playSound = (note, instrument) => {
@@ -101,13 +103,6 @@ const SynthKeys = () => {
     setSelectedInstrument(event.target.value);
   };
 
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
   const keyActions = {
     '1': () => playSound(440, selectedInstrument),
     '2': () => playSound(493.88, selectedInstrument),
@@ -126,6 +121,20 @@ const SynthKeys = () => {
     }
   };
 
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const handleKeyDown = (event) => {
+    const action = keyActions[event.key];
+    if (action) {
+      action();
+    }
+  };
+
   return (
     <div className="synth-keys">
       <NavBar />
@@ -139,8 +148,12 @@ const SynthKeys = () => {
         <button key={key} onClick={action}>{key}</button>
       ))}
       <button onClick={stopAllSounds}>Stop</button>
-      <button onClick={playRecording}>Play Recording</button>
-      {isRecording? <button onClick={stopRecording}>Stop Recording</button> : <button onClick={startRecording}>Start Recording</button>}
+      <button onClick={isPlaying ? pauseRecording : playRecording}>
+        {isPlaying ? "Pause Recording" : "Play Recording"}
+      </button>
+      {isRecording ? <button onClick={stopRecording}>Stop Recording</button> : <button onClick={startRecording}>Start Recording</button>}
+      {/* Render the audio player */}
+      <audio ref={audioPlayer} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleDurationChange} controls />
     </div>
   );
 };
