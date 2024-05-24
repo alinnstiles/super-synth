@@ -12,6 +12,8 @@ if __name__ == '__main__':
         print("Seeding database...")
 
         User.query.delete()
+        Recording.query.delete()
+        Comment.query.delete()
         
         recordings = []
         

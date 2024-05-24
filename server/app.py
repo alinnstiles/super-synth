@@ -99,7 +99,7 @@ def post_user_recordings():
 
 # delete recording
 @app.delete('/api/recording/<int:id>')
-def delete_comment(id):
+def delete_recording(id):
     current_recording = Recording.query.where(Recording.id == id).first()
     if current_recording:
         db.session.delete(current_recording)
@@ -145,11 +145,11 @@ def patch_comment(id):
             return current_comment.to_dict(), 201
 
 # delete comment
-@app.delete('/api/comment/<int:id>')
+@app.delete('/api/delete-comment/<int:id>')
 def delete_comment(id):
-    current_comment = Comment.query.where(Comment.id == id).first()
-    if current_comment:
-        db.session.delete(current_comment)
+    comment_to_delete = Comment.query.where(Comment.id == id).first()
+    if comment_to_delete:
+        db.session.delete(comment_to_delete)
         db.session.commit()
         return {}, 204
 
