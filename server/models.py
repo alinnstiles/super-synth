@@ -32,8 +32,6 @@ class User(db.Model, SerializerMixin):
     #     updated_value = value.strip().replace(' ', '_')
     #     if updated_value.length() > 4:
     #         return updated_value
-    
-    # TODO Add Authentication
 
 class Recording(db.Model, SerializerMixin):
     
