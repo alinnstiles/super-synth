@@ -7,6 +7,9 @@ const SynthKeys = () => {
   const [selectedInstrument, setSelectedInstrument] = useState('sine');
   const synthRef = useRef(null);
   const [activeOscillators, setActiveOscillators] = useState(new Map());
+  const [recordingStartTime, setRecordingStartTime] = useState(0);
+  const [songNotes, setSongNotes] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
 
   const keysData = [
     { note: 'z', class: 'white' },  // C4
@@ -53,6 +56,9 @@ const SynthKeys = () => {
       const note = getFrequency(key);
       playSound(note, selectedInstrument);
       addActiveClass(note);
+      if (isRecording) {
+        recordNote(key);
+      }
     }
   };
 
@@ -102,14 +108,71 @@ const SynthKeys = () => {
     const key = document.querySelector(`.key[data-note="${note}"]`);
     if (key) {
       key.classList.add('active');
+      // Set a timeout to remove the 'active' class after 50ms
+      setTimeout(() => {
+        key.classList.remove('active');
+      }, 50);
     }
   };
-
+  
   const removeActiveClass = note => {
     const key = document.querySelector(`.key[data-note="${note}"]`);
     if (key) {
       key.classList.remove('active');
     }
+  };
+
+  const toggleRecording = () => {
+    setIsRecording(prevState => !prevState);
+    if (!isRecording) {
+      startRecording();
+    } else {
+      stopRecording();
+    }
+  };
+
+  const startRecording = () => {
+    setRecordingStartTime(Date.now());
+    setSongNotes([]);
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    playSong();
+  };
+
+  const playSong = () => {
+    if (songNotes.length === 0) return;
+    songNotes.forEach(note => {
+      setTimeout(() => {
+        playNoteByKey(note);
+      }, note.startTime);
+    });
+  };
+
+  const playNoteByKey = key => {
+    const noteAudio = document.getElementById(key);
+    if (noteAudio) {
+      noteAudio.currentTime = 0;
+      noteAudio.play();
+      const keyElement = document.querySelector(`.key[data-note="${key}"]`);
+      if (keyElement) {
+        keyElement.classList.add('active');
+        noteAudio.addEventListener('ended', () => {
+          keyElement.classList.remove('active');
+        });
+      }
+    }
+  };
+
+  const recordNote = note => {
+    setSongNotes(prevNotes => [
+      ...prevNotes,
+      {
+        key: note,
+        startTime: Date.now() - recordingStartTime
+      }
+    ]);
   };
 
   useEffect(() => {
@@ -124,12 +187,13 @@ const SynthKeys = () => {
   return (
     <div className="synth-keys">
       <NavBar />
-      <select value={selectedInstrument} onChange={handleInstrumentChange}>
+      <select value={selectedInstrument} onChange={handleInstrumentChange} className="btn">
         <option value="sine">Sine Wave</option>
         <option value="square">Square Wave</option>
         <option value="triangle">Triangle Wave</option>
         <option value="sawtooth">Sawtooth Wave</option>
       </select>
+      <button onClick={stopAllSounds} className="btn">Stop</button>
       <div className="piano">
         {keysData.map(({ note, class: keyClass }, index) => (
           <div
@@ -138,6 +202,9 @@ const SynthKeys = () => {
             onMouseDown={() => {
               playSound(getFrequency(note), selectedInstrument);
               addActiveClass(note);
+              if (isRecording) {
+                recordNote(note);
+              }
             }}
             onMouseUp={() => removeActiveClass(note)}
             onMouseLeave={() => removeActiveClass(note)}
@@ -147,7 +214,11 @@ const SynthKeys = () => {
           </div>
         ))}
       </div>
-      <button onClick={stopAllSounds}>Stop</button>
+      <button className={`record-button btn ${isRecording ? 'active' : ''}`} onClick={toggleRecording}>
+        {isRecording ? 'Stop Recording' : 'Record'}
+      </button>
+      <button className="play-button btn active">Play</button>
+      <button className="save-button btn active">Save</button>
     </div>
   );
 };
