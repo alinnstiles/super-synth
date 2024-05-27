@@ -1,86 +1,30 @@
 import React, { useRef, useEffect, useState } from 'react';
 import NavBar from './NavBar';
 import './NavBar.css';
-import axios from 'axios';
+import './SynthKeys.css';
 
 const SynthKeys = () => {
   const [selectedInstrument, setSelectedInstrument] = useState('sine');
   const synthRef = useRef(null);
   const [activeOscillators, setActiveOscillators] = useState(new Map());
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordedChunks, setRecordedChunks] = useState([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0); // State to hold the duration of the recorded audio
 
-  let mediaRecorder;
-  let audioChunks = [];
-  let audioPlayer = useRef(null); // Reference to the audio player
+  const keysData = [
+    { note: 'z', class: 'white' },  // C4
+    { note: 's', class: 'black' },  // C#4/Db4
+    { note: 'x', class: 'white' },  // D4
+    { note: 'd', class: 'black' },  // D#4/Eb4
+    { note: 'c', class: 'white' },  // E4
+    { note: 'v', class: 'white' },  // F4
+    { note: 'g', class: 'black' },  // F#4/Gb4
+    { note: 'b', class: 'white' },  // G4
+    { note: 'h', class: 'black' },  // G#4/Ab4
+    { note: 'n', class: 'white' },  // A4
+    { note: 'j', class: 'black' },  // A#4/Bb4
+    { note: 'm', class: 'white' }   // B4
+  ];
 
-  const startRecording = () => {
-    audioChunks = [];
-    setIsRecording(true);
-    navigator.mediaDevices.getUserMedia({ audio: true })
-     .then(stream => {
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = e => {
-          audioChunks.push(e.data);
-        };
-        mediaRecorder.onstop = () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-          setRecordedChunks(prevChunks => [...prevChunks, audioBlob]);
-          audioChunks = [];
-        };
-        mediaRecorder.start();
-      })
-     .catch(err => console.error('Error recording:', err));
-  };
-
-  const stopRecording = async () => {
-    if (mediaRecorder) {
-      setIsRecording(false);
-      mediaRecorder.stop();
-      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-      const formData = new FormData();
-      formData.append('file', audioBlob, 'recording.wav');
-      try {
-        const response = await axios.post('/upload-recording', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        console.log(response.data.message);
-      } catch (error) {
-        console.error('Failed to upload recording:', error);
-      }
-      audioChunks = [];
-    }
-  };
-
-  const playRecording = () => {
-    if (recordedChunks.length === 0) {
-      console.log("No recordings available.");
-      return;
-    }
-    const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-    const audioURL = URL.createObjectURL(audioBlob);
-    audioPlayer.current.src = audioURL;
-    audioPlayer.current.play();
-    setIsPlaying(true);
-  };
-
-  const pauseRecording = () => {
-    setIsPlaying(false);
-    audioPlayer.current.pause();
-  };
-
-  const handleTimeUpdate = () => {
-    setCurrentTime(audioPlayer.current.currentTime);
-  };
-
-  const handleDurationChange = () => {
-    setDuration(audioPlayer.current.duration);
-  };
+  const WHITE_KEYS = ['z', 'x', 'c', 'v', 'b', 'n', 'm'];
+  const BLACK_KEYS = ['s', 'd', 'g', 'h', 'j'];
 
   const playSound = (note, instrument) => {
     const synth = synthRef.current || (synthRef.current = new AudioContext());
@@ -99,25 +43,48 @@ const SynthKeys = () => {
     setActiveOscillators(new Map());
   };
 
-  const handleInstrumentChange = (event) => {
+  const handleInstrumentChange = event => {
     setSelectedInstrument(event.target.value);
   };
 
-  const keyActions = {
-    '1': () => playSound(440, selectedInstrument),
-    '2': () => playSound(493.88, selectedInstrument),
-    '3': () => playSound(523.25, selectedInstrument),
-    '4': () => playSound(587.33, selectedInstrument),
-    '5': () => playSound(659.25, selectedInstrument),
-    '6': () => playSound(698.46, selectedInstrument),
-    '7': () => playSound(783.99, selectedInstrument),
-    '8': () => playSound(880, selectedInstrument),
-    'r': () => {
-      if (!isRecording) {
-        startRecording();
-      } else {
-        stopRecording();
-      }
+  const handleKeyDown = event => {
+    const key = event.key.toLowerCase();
+    if (WHITE_KEYS.includes(key) || BLACK_KEYS.includes(key)) {
+      playSound(getFrequency(key), selectedInstrument);
+    }
+  };
+
+  const getFrequency = key => {
+    // Map keys to frequencies here
+    switch (key) {
+      // White keys
+      case 'z':
+        return 261.63; // C4
+      case 'x':
+        return 293.66; // D4
+      case 'c':
+        return 329.63; // E4
+      case 'v':
+        return 349.23; // F4
+      case 'b':
+        return 392.00; // G4
+      case 'n':
+        return 440.00; // A4
+      case 'm':
+        return 493.88; // B4
+      // Black keys
+      case 's':
+        return 277.18; // C#4/Db4
+      case 'd':
+        return 311.13; // D#4/Eb4
+      case 'g':
+        return 369.99; // F#4/Gb4
+      case 'h':
+        return 415.30; // G#4/Ab4
+      case 'j':
+        return 466.16; // A#4/Bb4
+      default:
+        return 0;
     }
   };
 
@@ -128,13 +95,6 @@ const SynthKeys = () => {
     };
   }, []);
 
-  const handleKeyDown = (event) => {
-    const action = keyActions[event.key];
-    if (action) {
-      action();
-    }
-  };
-
   return (
     <div className="App">
       <NavBar />
@@ -144,16 +104,18 @@ const SynthKeys = () => {
         <option value="triangle">Triangle Wave</option>
         <option value="sawtooth">Sawtooth Wave</option>
       </select>
-      {Object.entries(keyActions).map(([key, action]) => (
-        <button key={key} onClick={action}>{key}</button>
-      ))}
+      <div className="piano">
+        {keysData.map(({ note, class: keyClass }, index) => (
+          <div
+            key={index}
+            className={`key ${keyClass}`}
+            onClick={() => playSound(getFrequency(note), selectedInstrument)}
+          >
+            {note}
+          </div>
+        ))}
+      </div>
       <button onClick={stopAllSounds}>Stop</button>
-      <button onClick={isPlaying ? pauseRecording : playRecording}>
-        {isPlaying ? "Pause Recording" : "Play Recording"}
-      </button>
-      {isRecording ? <button onClick={stopRecording}>Stop Recording</button> : <button onClick={startRecording}>Start Recording</button>}
-      {/* Render the audio player */}
-      <audio ref={audioPlayer} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleDurationChange} controls />
     </div>
   );
 };
