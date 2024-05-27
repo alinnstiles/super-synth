@@ -50,7 +50,17 @@ const SynthKeys = () => {
   const handleKeyDown = event => {
     const key = event.key.toLowerCase();
     if (WHITE_KEYS.includes(key) || BLACK_KEYS.includes(key)) {
-      playSound(getFrequency(key), selectedInstrument);
+      const note = getFrequency(key);
+      playSound(note, selectedInstrument);
+      addActiveClass(note);
+    }
+  };
+
+  const handleKeyUp = event => {
+    const key = event.key.toLowerCase();
+    if (WHITE_KEYS.includes(key) || BLACK_KEYS.includes(key)) {
+      const note = getFrequency(key);
+      removeActiveClass(note);
     }
   };
 
@@ -88,10 +98,26 @@ const SynthKeys = () => {
     }
   };
 
+  const addActiveClass = note => {
+    const key = document.querySelector(`.key[data-note="${note}"]`);
+    if (key) {
+      key.classList.add('active');
+    }
+  };
+
+  const removeActiveClass = note => {
+    const key = document.querySelector(`.key[data-note="${note}"]`);
+    if (key) {
+      key.classList.remove('active');
+    }
+  };
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
@@ -109,7 +135,13 @@ const SynthKeys = () => {
           <div
             key={index}
             className={`key ${keyClass}`}
-            onClick={() => playSound(getFrequency(note), selectedInstrument)}
+            onMouseDown={() => {
+              playSound(getFrequency(note), selectedInstrument);
+              addActiveClass(note);
+            }}
+            onMouseUp={() => removeActiveClass(note)}
+            onMouseLeave={() => removeActiveClass(note)}
+            data-note={note}
           >
             {note}
           </div>
