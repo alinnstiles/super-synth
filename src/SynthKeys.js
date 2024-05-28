@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
 import './NavBar.css';
 import './SynthKeys.css';
@@ -10,6 +11,7 @@ const SynthKeys = () => {
   const [recordingStartTime, setRecordingStartTime] = useState(0);
   const [songNotes, setSongNotes] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
+  const navigate = useNavigate();
 
   const keysData = [
     { note: 'z', class: 'white' },  // C4
@@ -133,19 +135,20 @@ const SynthKeys = () => {
 
   const stopRecording = () => {
     setIsRecording(false);
-    // Optional: Play the song immediately after stopping recording
-    // playSong();
   };
 
   const playSong = () => {
     if (songNotes.length === 0) return;
+  
+    let startTime = songNotes[0].startTime;
+  
     songNotes.forEach(note => {
       setTimeout(() => {
         playNoteByKey(note.key);
         setTimeout(() => {
           stopNoteByKey(note.key);
         }, 500); // Adjust this duration to match your needs
-      }, note.startTime);
+      }, note.startTime - startTime); // Ensure playback with correct timing relative to the start time of the first note
     });
   };
 
@@ -173,13 +176,13 @@ const SynthKeys = () => {
 
   const saveRecording = () => {
     const recording = JSON.stringify(songNotes, null, 2);
-    const blob = new Blob([recording], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'recording.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    const savedSongs = JSON.parse(localStorage.getItem('savedSongs')) || [];
+    savedSongs.push({ notes: songNotes });
+    localStorage.setItem('savedSongs', JSON.stringify(savedSongs));
+  };
+
+  const viewSavedSongs = () => {
+    navigate('/myrecordings');
   };
 
   useEffect(() => {
@@ -235,6 +238,7 @@ const SynthKeys = () => {
       </button>
       <button className="play-button btn" onClick={playSong}>Play</button>
       <button className="save-button btn" onClick={saveRecording}>Save</button>
+      <button className="view-saved-songs-button btn" onClick={viewSavedSongs}>View Saved Songs</button>
     </div>
   );
 };
