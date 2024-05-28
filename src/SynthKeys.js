@@ -35,8 +35,20 @@ const SynthKeys = () => {
     oscillator.type = instrument;
     oscillator.frequency.value = note;
     oscillator.connect(synth.destination);
-    setActiveOscillators(prevState => new Map(prevState).set(note, oscillator));
     oscillator.start();
+    setActiveOscillators(prevState => new Map(prevState).set(note, oscillator));
+  };
+
+  const stopSound = note => {
+    if (activeOscillators.has(note)) {
+      const oscillator = activeOscillators.get(note);
+      oscillator.stop();
+      setActiveOscillators(prevState => {
+        const newMap = new Map(prevState);
+        newMap.delete(note);
+        return newMap;
+      });
+    }
   };
 
   const stopAllSounds = () => {
@@ -54,10 +66,12 @@ const SynthKeys = () => {
     const key = event.key.toLowerCase();
     if (WHITE_KEYS.includes(key) || BLACK_KEYS.includes(key)) {
       const note = getFrequency(key);
-      playSound(note, selectedInstrument);
-      addActiveClass(note);
-      if (isRecording) {
-        recordNote(key);
+      if (!activeOscillators.has(note)) {
+        playSound(note, selectedInstrument);
+        addActiveClass(key);
+        if (isRecording) {
+          recordNote(key);
+        }
       }
     }
   };
@@ -66,59 +80,40 @@ const SynthKeys = () => {
     const key = event.key.toLowerCase();
     if (WHITE_KEYS.includes(key) || BLACK_KEYS.includes(key)) {
       const note = getFrequency(key);
-      removeActiveClass(note);
+      stopSound(note);
+      removeActiveClass(key);
     }
   };
 
   const getFrequency = key => {
-    // Map keys to frequencies here
     switch (key) {
-      // White keys
-      case 'z':
-        return 261.63; // C4
-      case 'x':
-        return 293.66; // D4
-      case 'c':
-        return 329.63; // E4
-      case 'v':
-        return 349.23; // F4
-      case 'b':
-        return 392.00; // G4
-      case 'n':
-        return 440.00; // A4
-      case 'm':
-        return 493.88; // B4
-      // Black keys
-      case 's':
-        return 277.18; // C#4/Db4
-      case 'd':
-        return 311.13; // D#4/Eb4
-      case 'g':
-        return 369.99; // F#4/Gb4
-      case 'h':
-        return 415.30; // G#4/Ab4
-      case 'j':
-        return 466.16; // A#4/Bb4
-      default:
-        return 0;
+      case 'z': return 261.63; // C4
+      case 'x': return 293.66; // D4
+      case 'c': return 329.63; // E4
+      case 'v': return 349.23; // F4
+      case 'b': return 392.00; // G4
+      case 'n': return 440.00; // A4
+      case 'm': return 493.88; // B4
+      case 's': return 277.18; // C#4/Db4
+      case 'd': return 311.13; // D#4/Eb4
+      case 'g': return 369.99; // F#4/Gb4
+      case 'h': return 415.30; // G#4/Ab4
+      case 'j': return 466.16; // A#4/Bb4
+      default: return 0;
     }
   };
 
-  const addActiveClass = note => {
-    const key = document.querySelector(`.key[data-note="${note}"]`);
-    if (key) {
-      key.classList.add('active');
-      // Set a timeout to remove the 'active' class after 50ms
-      setTimeout(() => {
-        key.classList.remove('active');
-      }, 50);
+  const addActiveClass = key => {
+    const keyElement = document.querySelector(`.key[data-note="${key}"]`);
+    if (keyElement) {
+      keyElement.classList.add('active');
     }
   };
-  
-  const removeActiveClass = note => {
-    const key = document.querySelector(`.key[data-note="${note}"]`);
-    if (key) {
-      key.classList.remove('active');
+
+  const removeActiveClass = key => {
+    const keyElement = document.querySelector(`.key[data-note="${key}"]`);
+    if (keyElement) {
+      keyElement.classList.remove('active');
     }
   };
 
@@ -138,41 +133,53 @@ const SynthKeys = () => {
 
   const stopRecording = () => {
     setIsRecording(false);
-    playSong();
+    // Optional: Play the song immediately after stopping recording
+    // playSong();
   };
 
   const playSong = () => {
     if (songNotes.length === 0) return;
     songNotes.forEach(note => {
       setTimeout(() => {
-        playNoteByKey(note);
+        playNoteByKey(note.key);
+        setTimeout(() => {
+          stopNoteByKey(note.key);
+        }, 500); // Adjust this duration to match your needs
       }, note.startTime);
     });
   };
 
   const playNoteByKey = key => {
-    const noteAudio = document.getElementById(key);
-    if (noteAudio) {
-      noteAudio.currentTime = 0;
-      noteAudio.play();
-      const keyElement = document.querySelector(`.key[data-note="${key}"]`);
-      if (keyElement) {
-        keyElement.classList.add('active');
-        noteAudio.addEventListener('ended', () => {
-          keyElement.classList.remove('active');
-        });
-      }
-    }
+    const note = getFrequency(key);
+    playSound(note, selectedInstrument);
+    addActiveClass(key);
   };
 
-  const recordNote = note => {
+  const stopNoteByKey = key => {
+    const note = getFrequency(key);
+    stopSound(note);
+    removeActiveClass(key);
+  };
+
+  const recordNote = key => {
     setSongNotes(prevNotes => [
       ...prevNotes,
       {
-        key: note,
+        key: key,
         startTime: Date.now() - recordingStartTime
       }
     ]);
+  };
+
+  const saveRecording = () => {
+    const recording = JSON.stringify(songNotes, null, 2);
+    const blob = new Blob([recording], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'recording.json';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -182,7 +189,7 @@ const SynthKeys = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [activeOscillators, selectedInstrument, isRecording]);
 
   return (
     <div className="App">
@@ -200,14 +207,23 @@ const SynthKeys = () => {
             key={index}
             className={`key ${keyClass}`}
             onMouseDown={() => {
-              playSound(getFrequency(note), selectedInstrument);
+              const frequency = getFrequency(note);
+              playSound(frequency, selectedInstrument);
               addActiveClass(note);
               if (isRecording) {
                 recordNote(note);
               }
             }}
-            onMouseUp={() => removeActiveClass(note)}
-            onMouseLeave={() => removeActiveClass(note)}
+            onMouseUp={() => {
+              const frequency = getFrequency(note);
+              stopSound(frequency);
+              removeActiveClass(note);
+            }}
+            onMouseLeave={() => {
+              const frequency = getFrequency(note);
+              stopSound(frequency);
+              removeActiveClass(note);
+            }}
             data-note={note}
           >
             {note}
@@ -217,8 +233,8 @@ const SynthKeys = () => {
       <button className={`record-button btn ${isRecording ? 'active' : ''}`} onClick={toggleRecording}>
         {isRecording ? 'Stop Recording' : 'Record'}
       </button>
-      <button className="play-button btn active">Play</button>
-      <button className="save-button btn active">Save</button>
+      <button className="play-button btn" onClick={playSong}>Play</button>
+      <button className="save-button btn" onClick={saveRecording}>Save</button>
     </div>
   );
 };
