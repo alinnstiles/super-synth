@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 
-from models import db, User, Recording, Comment
+from models import db, User, Recording, Comment, Note
 
 from dotenv import load_dotenv
 
@@ -90,11 +90,21 @@ def post_user_recordings():
     
     recording = Recording(
         name = request.json['name'],
-        mp3 = request.json['mp3'],
         likes = 0,
         public = request.json['public'],
         user_id = user_id
     )
+    db.session.add(recording)
+    db.session.commit()
+    for note in request.json['notes']:
+        current_note = Note(
+            key = note.get('key'),
+            start_time = note.get('start_time'),
+            end_time = note.get('end_time'),
+            recording_id = recording.id
+        )
+        db.session.add(current_note)
+        db.session.commit()
     return recording.to_dict(), 201
 
 # delete recording

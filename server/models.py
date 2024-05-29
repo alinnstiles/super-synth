@@ -36,23 +36,35 @@ class User(db.Model, SerializerMixin):
 class Recording(db.Model, SerializerMixin):
     
     __tablename__ = 'recordings_table'
-    # TODO Update MP3
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    mp3 = db.Column(db.String, nullable=False)
     likes = db.Column(db.Integer, default=0)
     public = db.Column(db.Boolean, default=False)
     time_created = db.Column(db.DateTime, default=datetime.datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
-    synth = []
     
     user = db.relationship('User', back_populates='recordings')
     comments = db.relationship('Comment', back_populates='recording')
+    notes = db.relationship('Note', back_populates='recording')
     
-    serialize_rules = ['-user.recordings', '-comments.recording']
+    serialize_rules = ['-user.recordings', '-comments.recording', '-notes.recording']
     
     def __repr__(self):
         return f'Recording(id={self.id}, name={self.name}, mp3={self.mp3}, likes={self.likes}, public={self.public}, time_created={self.time_created}, user_id={self.user_id})'
+
+class Note(db.Model, SerializerMixin):
+    
+    __tablename__ = 'notes_table'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String, nullable=False)
+    start_time = db.Column(db.Float)
+    end_time = db.Column(db.Float)
+    recording_id = db.Column(db.Integer, db.ForeignKey('recordings_table.id'))
+    
+    recording = db.relationship('Recording', back_populates='notes')
+    
+    serialize_rules = ['-recording.notes']
 
 class Comment(db.Model, SerializerMixin):
     
