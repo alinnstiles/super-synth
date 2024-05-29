@@ -18,6 +18,7 @@ function CommunitySounds() {
 
   return (
     <div className="comment-section">
+      <NavBar /> 
       <h1>Community Heat</h1>
       <h2>Comments</h2>
       <form onSubmit={handleSubmit}>
