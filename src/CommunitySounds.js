@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import NavBar from './NavBar';
+import './NavBar.css';
 
 function CommunitySounds() {
   const [comments, setComments] = useState([]);
@@ -16,6 +18,7 @@ function CommunitySounds() {
 
   return (
     <div className="comment-section">
+      <h1>Community Heat</h1>
       <h2>Comments</h2>
       <form onSubmit={handleSubmit}>
         <textarea
