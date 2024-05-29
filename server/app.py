@@ -56,6 +56,7 @@ def check_session():
 # Session login
 @app.post('/api/login')
 def login():
+    print("attempted login")
     user = User.query.where(User.username == request.json.get('username')).first()
     if user and bcrypt.check_password_hash(user._hashed_password, request.json.get('password')):
         session['user_id'] = user.id
