@@ -85,7 +85,7 @@ def get_user_recordings():
 # post recording
 @app.post('/api/user-recordings')
 def post_user_recordings():
-    user_id = session.get['user_id']
+    user_id = session.get('user_id')
     if not user_id:
         return {"error": "Not logged in"}, 401
     

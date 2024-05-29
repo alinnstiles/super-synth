@@ -10,6 +10,9 @@ const SynthKeys = () => {
   const [recordingStartTime, setRecordingStartTime] = useState(0);
   const [songNotes, setSongNotes] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [textFocus, setTextFocus] = useState(false);
+  const [name, setName] = useState("");
+  const [publicSong, setPublicSong] = useState(false);
 
   const keysData = [
     { note: 'z', class: 'white' },  // C4
@@ -70,14 +73,16 @@ const SynthKeys = () => {
   };
 
   const handleKeyDown = event => {
-    const key = event.key.toLowerCase();
-    if (WHITE_KEYS.includes(key) || BLACK_KEYS.includes(key)) {
-      const note = getFrequency(key);
-      if (!activeOscillators.has(note)) {
-        playSound(note, selectedInstrument);
-        addActiveClass(key);
-        if (isRecording) {
-          recordNote(key);
+    if (textFocus == false){
+      const key = event.key.toLowerCase();
+      if (WHITE_KEYS.includes(key) || BLACK_KEYS.includes(key)) {
+        const note = getFrequency(key);
+        if (!activeOscillators.has(note)) {
+          playSound(note, selectedInstrument);
+          addActiveClass(key);
+          if (isRecording) {
+            recordNote(key);
+          }
         }
       }
     }
@@ -144,18 +149,6 @@ const SynthKeys = () => {
     // playSong();
   };
 
-  // const playSong = () => {
-  //   if (songNotes.length === 0) return;
-  //   songNotes.forEach(note => {
-  //     setTimeout(() => {
-  //       playNoteByKey(note.key);
-  //       setTimeout(() => {
-  //         stopNoteByKey(note.key);
-  //       }, 50); // Adjust this duration to match your needs
-  //     }, note.startTime);
-  //   });
-  // };
-
   async function processSound(sound) {
     return new Promise((resolve) => {
       const synth = synthRef.current || (synthRef.current = new AudioContext());
@@ -204,15 +197,28 @@ const SynthKeys = () => {
   };
 
   const saveRecording = () => {
-    const recording = JSON.stringify(songNotes, null, 2);
-    const blob = new Blob([recording], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'recording.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    fetch('/api/user-recordings', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body:JSON.stringify({
+        "name": name,
+        "public": publicSong,
+        "notes": songNotes
+      })
+    })
+    .then(res => res.json())
+    .then(promise => console.log(promise))
   };
+
+  function handleName(event){
+    setName(event.target.value);
+  }
+
+  function handlePublic(){
+    setPublicSong(!publicSong)
+  }
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -266,6 +272,27 @@ const SynthKeys = () => {
       </button>
       <button className="play-button btn" onClick={playSong}>Play</button>
       <button className="save-button btn" onClick={saveRecording}>Save</button>
+      <form>
+        <label for="name">Name: </label>
+        <input 
+          type="text" 
+          name="name"
+          onFocus={() => {
+            if (textFocus === false){
+              setTextFocus(true);
+            }
+          }}
+          onBlur={() => {
+            if (textFocus === true){
+              setTextFocus(false);
+            }
+          }}
+          onChange={handleName}
+          value={name}
+          ></input>
+        <label for="public">Public: </label>
+        <input type="checkbox" name="public" value={publicSong} onChange={handlePublic}></input>
+      </form>
     </div>
   );
 };
