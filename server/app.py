@@ -79,7 +79,7 @@ def get_user_recordings():
     if not user_id:
         return {"error": "Not logged in"}, 401
 
-    recordings = Recording.query.filter_by(user_id=user_id).all()
+    recordings = Recording.query.filter_by(Recording.id==user_id).all()
     return jsonify([recording.to_dict() for recording in recordings]), 200
 
 # post recording
