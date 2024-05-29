@@ -36,7 +36,7 @@ class User(db.Model, SerializerMixin):
 class Recording(db.Model, SerializerMixin):
     
     __tablename__ = 'recordings_table'
-    
+    # TODO Update MP3
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     mp3 = db.Column(db.String, nullable=False)
@@ -44,6 +44,7 @@ class Recording(db.Model, SerializerMixin):
     public = db.Column(db.Boolean, default=False)
     time_created = db.Column(db.DateTime, default=datetime.datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
+    synth = []
     
     user = db.relationship('User', back_populates='recordings')
     comments = db.relationship('Comment', back_populates='recording')

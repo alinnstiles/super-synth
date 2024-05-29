@@ -36,7 +36,11 @@ const SynthKeys = () => {
     oscillator.frequency.value = note;
     oscillator.connect(synth.destination);
     oscillator.start();
-    setActiveOscillators(prevState => new Map(prevState).set(note, oscillator));
+    setActiveOscillators(prevState => {
+      const current_synth = new Map(prevState).set(note, oscillator);
+      console.log(current_synth)
+      return current_synth;
+    });
   };
 
   const stopSound = note => {
@@ -46,6 +50,9 @@ const SynthKeys = () => {
       setActiveOscillators(prevState => {
         const newMap = new Map(prevState);
         newMap.delete(note);
+        // console.log(prevState)
+        // console.log(newMap);
+        // console.log("-------break---------")
         return newMap;
       });
     }
@@ -137,29 +144,54 @@ const SynthKeys = () => {
     // playSong();
   };
 
-  const playSong = () => {
-    if (songNotes.length === 0) return;
-    songNotes.forEach(note => {
+  // const playSong = () => {
+  //   if (songNotes.length === 0) return;
+  //   songNotes.forEach(note => {
+  //     setTimeout(() => {
+  //       playNoteByKey(note.key);
+  //       setTimeout(() => {
+  //         stopNoteByKey(note.key);
+  //       }, 50); // Adjust this duration to match your needs
+  //     }, note.startTime);
+  //   });
+  // };
+
+  async function processSound(sound) {
+    return new Promise((resolve) => {
+      const synth = synthRef.current || (synthRef.current = new AudioContext());
+      const oscillator = synth.createOscillator();
+      oscillator.type = selectedInstrument;
+      oscillator.frequency.value = getFrequency(sound.key);
+      oscillator.connect(synth.destination);
+      oscillator.start();
+      console.log("Processed sound");
       setTimeout(() => {
-        playNoteByKey(note.key);
-        setTimeout(() => {
-          stopNoteByKey(note.key);
-        }, 500); // Adjust this duration to match your needs
-      }, note.startTime);
+        // const oscillator = sound.key;
+        oscillator.stop();
+        resolve();
+      }, 300);
     });
   };
 
-  const playNoteByKey = key => {
-    const note = getFrequency(key);
-    playSound(note, selectedInstrument);
-    addActiveClass(key);
-  };
+  async function playSong() {
+    for (const sound of songNotes){
+      await processSound(sound);
+    }
+    console.log("All notes played")
+  }
 
-  const stopNoteByKey = key => {
-    const note = getFrequency(key);
-    stopSound(note);
-    removeActiveClass(key);
-  };
+  // const playNoteByKey = key => {
+  //   const note = getFrequency(key);
+  //   playSound(note, selectedInstrument);
+  //   addActiveClass(key);
+  // };
+
+  // const stopNoteByKey = key => {
+  //   const note = getFrequency(key);
+  //   console.log(note)
+  //   stopSound(note);
+  //   removeActiveClass(key);
+  // };
 
   const recordNote = key => {
     setSongNotes(prevNotes => [
@@ -215,15 +247,14 @@ const SynthKeys = () => {
               }
             }}
             onMouseUp={() => {
-              const frequency = getFrequency(note);
-              stopSound(frequency);
+              const frequency = getFrequency(note);              stopSound(frequency);
               removeActiveClass(note);
             }}
-            onMouseLeave={() => {
-              const frequency = getFrequency(note);
-              stopSound(frequency);
-              removeActiveClass(note);
-            }}
+            // onMouseLeave={() => {
+            //   const frequency = getFrequency(note);
+            //   stopSound(frequency);
+            //   removeActiveClass(note);
+            // }}
             data-note={note}
           >
             {note}
