@@ -12,7 +12,7 @@ function Signup({setCurrentUser}) {
   function handleSubmit(e) {
     e.preventDefault()
 
-    fetch('http://localhost:5555/users', {
+    fetch('api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({username, password})
