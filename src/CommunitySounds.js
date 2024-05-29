@@ -1,29 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import NavBar from './NavBar';
+import React, { useState } from 'react';
 
 function CommunitySounds() {
-  const [publicRecordings, setPublicRecordings] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
 
-  useEffect(() => {
-    fetch('/public-recordings')
-    .then(response => response.json())
-    .then(data => setPublicRecordings(data))
-    .catch(error => console.error('Failed to load public recordings:', error));
-  }, []);
-  
+  const handleInputChange = (event) => {
+    setNewComment(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setComments([...comments, newComment]);
+    setNewComment('');
+  };
 
   return (
-    <div className="App">
-      <NavBar />
-      <h2>Community Sounds</h2>
-      {publicRecordings.map((recording, index) => (
-        <div key={index}>
-          <audio controls>
-            <source src={URL.createObjectURL(recording.blob)} type="audio/wav" />
-            Your browser does not support the audio element.
-          </audio>
-        </div>
-      ))}
+    <div className="comment-section">
+      <h2>Comments</h2>
+      <form onSubmit={handleSubmit}>
+        <textarea
+          value={newComment}
+          onChange={handleInputChange}
+          placeholder="Add your comment..."
+        />
+        <button type="submit">Post</button>
+      </form>
+      <div className="comments-list">
+        {comments.map((comment, index) => (
+          <div key={index} className="comment">
+            {comment}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
