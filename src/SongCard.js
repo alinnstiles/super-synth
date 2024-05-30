@@ -83,7 +83,7 @@ function SongCard({song}){
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "likes": song.likes + (songLikes ? (1) : (-1))
+                "Flames": song.likes + (songLikes ? (1) : (-1))
             })
         })
         .then(res => res.json())
@@ -97,9 +97,9 @@ function SongCard({song}){
         <div>
             <h3>{song.name}</h3>
             <p><b>{"By: " + song.user.username}</b></p>
-            <p>{"Likes: " + song.likes}</p>
+            <p>{"Flames: " + song.likes}</p>
             <button className="play-button btn" onClick={playSong}>Play</button>
-            <button onClick={handleSongLike}>{songLikes ? "Unlike" : "Like"}</button>
+            <button onClick={handleSongLike}>{songLikes ? "Unflame" : "🔥"}</button>
             <h2>Comments</h2>
             <form onSubmit={handleSubmit}>
                 <textarea
