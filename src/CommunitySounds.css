@@ -20,3 +20,18 @@ body {
     text-align: center; /* Optionally align the content inside the comment-section */
   }
   
+  .song-item {
+  border: solid black 2px;
+  /* box-shadow: 3px 5px gray; */
+  width: 300px;
+  text-align: center;
+  background-color:#C7171733;
+  }
+
+  .comment {
+  border: solid black 2px;
+  /* box-shadow: 3px 5px gray; */
+  width: 300px;
+  text-align: center;
+  background-color:#C7171733;
+  }
