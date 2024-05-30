@@ -32,11 +32,12 @@ if __name__ == '__main__':
         
         for _ in range(0,5):
             r1 = Recording(
-                name = faker.name(),
+                name = choice(['Flame City', 'Beat Central', 'Sine Language', '🔥', '🔥🔥🔥', 'Beep Boop']),
                 likes = randint(1, 500),
                 public = True,
                 selected_instrument = choice(['sine','square','triangle','sawtooth']),
                 user_id = randint(1, 5)
+                
             )
             recordings.append(r1)
         
@@ -59,16 +60,16 @@ if __name__ == '__main__':
         
         comment = []
         
-        for _ in range(0,5):
-            c1 = Comment(
-                comment = faker.text(),
-                likes = randint(1, 500),
-                recording_id = randint(1, 5),
-                user_id = randint(1, 5)
-            )
-            comment.append(c1)
+        # for _ in range(0,5):
+        #     c1 = Comment(
+        #         comment = faker.text(),
+        #         likes = randint(1, 500),
+        #         recording_id = randint(1, 5),
+        #         user_id = randint(1, 5)
+        #     )
+        #     comment.append(c1)
         
-        db.session.add_all(comment)
-        db.session.commit()
+        # db.session.add_all(comment)
+        # db.session.commit()
         
         print("Seeding complete!")
