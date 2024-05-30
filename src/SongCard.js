@@ -95,7 +95,7 @@ function SongCard({song}){
     }
 
     return (
-        <div>
+        <div className="song-item">
             <h3>{song.name}</h3>
             <p><b>{"By: " + song.user.username}</b></p>
             <p>{"Flames: " + totalLikes}</p>
