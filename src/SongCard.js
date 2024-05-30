@@ -5,6 +5,7 @@ import Comment from './Comment';
 function SongCard({song}){
 
     const [songLikes, setSongLikes] = useState(false)
+    const [totalLikes, setTotalLikes] = useState(song.likes)
     const [newComment, setNewComment] = useState('');
     const [comments, setComments] = useState(song.comments)
 
@@ -83,12 +84,12 @@ function SongCard({song}){
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "Flames": song.likes + (songLikes ? (1) : (-1))
+                "likes": totalLikes + (songLikes ? (-1) : (1))
             })
         })
         .then(res => res.json())
         .then(promise => {
-            console.log(promise.likes)
+            setTotalLikes(promise.likes)
             setSongLikes(!songLikes)
         })
     }
@@ -97,7 +98,7 @@ function SongCard({song}){
         <div>
             <h3>{song.name}</h3>
             <p><b>{"By: " + song.user.username}</b></p>
-            <p>{"Flames: " + song.likes}</p>
+            <p>{"Flames: " + totalLikes}</p>
             <button className="play-button btn" onClick={playSong}>Play</button>
             <button onClick={handleSongLike}>{songLikes ? "Unflame" : "🔥"}</button>
             <h2>Comments</h2>

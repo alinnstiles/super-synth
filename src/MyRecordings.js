@@ -7,11 +7,18 @@ const MyRecordings = () => {
   const [songs, setSongs] = useState([]);
 
   useEffect(() => {
-    fetch('/api/user-recordings')
+    fetch('/api/check-session')
     .then(res => res.json())
     .then(promise => {
-      console.log(promise)
-      setSongs(promise)
+      fetch('/api/user-recordings')
+      .then(res => res.json())
+      .then(promise => {
+        console.log(promise)
+        setSongs(promise)
+      })
+    })
+    .catch(() => {
+      alert("Please log in!")
     })
   }, []);
 
