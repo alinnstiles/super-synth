@@ -12,7 +12,7 @@ function Comment({current}){
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "likes": comment.likes + 1
+                "Flames:": comment.likes + 1
             })
         })
         .then(res => res.json())
@@ -23,8 +23,8 @@ function Comment({current}){
         <div className="comment">
             <p><b>{current.user.username}</b></p>
             <p>{current.comment}</p>
-            <p>{"likes: " + commentLikes}</p>
-            <button onClick={() => handleCommentLike(current)}>Like</button>
+            <p>{"Flames: " + commentLikes}</p>
+            <button onClick={() => handleCommentLike(current)}>🔥</button>
         </div>
     )
 }

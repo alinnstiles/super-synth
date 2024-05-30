@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .header-section {
+    background-color: #f0f0f0; /* Example background color */
+    padding: 20px; /* Example padding */
+    text-align: center;
+    margin-top: 0; /* Ensure no top margin */
+  }
+  
+  .main-section {
+    padding: 20px; /* Example padding */
+    text-align: center;
+  }
+  
+
+  .comment-section {
+    text-align: center; /* Optionally align the content inside the comment-section */
+  }
+  
