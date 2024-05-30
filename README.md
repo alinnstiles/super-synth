@@ -12,7 +12,7 @@ Playback Controls: Play back recorded songs with a single click.
 ### How to Use
 Upon launching Super Synth, you will see a virtual keyboard with keys corresponding to different musical notes. Select an instrument from the dropdown menu to change the waveform of the sound produced by the keyboard. Pressing a key will play the associated note, and holding down a key will sustain the note until released. The "Record" button allows you to start recording your performance, and pressing it again will stop the recording. You can then play back your recording with the "Play" button or save your recordings. 
 
-## Creators 
+## Contributors
 Super Synth is a web-based synthesizer and fullstack application created in JSX and Python by Alex, Brandon and Stephin. 
 
 We hope you enjoy it!
