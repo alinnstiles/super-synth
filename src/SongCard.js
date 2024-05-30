@@ -96,6 +96,7 @@ function SongCard({song}){
 
     return (
         <div className="song-item">
+        <div className="flex-container">
             <h3>{song.name}</h3>
             <p><b>{"By: " + song.user.username}</b></p>
             <p>{"Flames: " + totalLikes}</p>
@@ -114,6 +115,7 @@ function SongCard({song}){
                 {comments.map(current => (
                 <Comment current={current} key={current.id}/>
                 ))}
+            </div>
             </div>
         </div>
     )
