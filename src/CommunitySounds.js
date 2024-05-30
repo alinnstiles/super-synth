@@ -1,41 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from './NavBar';
 import './NavBar.css';
+import userEvent from '@testing-library/user-event';
+import SongCard from './SongCard'
 
 function CommunitySounds() {
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
+  
+  const [songs, setSongs] = useState([]);
 
-  const handleInputChange = (event) => {
-    setNewComment(event.target.value);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setComments([...comments, newComment]);
-    setNewComment('');
-  };
-
+  useEffect(() => {
+    fetch('/api/all-recordings')
+    .then(res => res.json())
+    .then(promise => {
+      setSongs(promise);
+      // console.log(promise);
+    })
+  }, [])
+  
   return (
     <div className="comment-section">
       <NavBar /> 
       <h1>Community Heat</h1>
-      <h2>Comments</h2>
-      <form onSubmit={handleSubmit}>
-        <textarea
-          value={newComment}
-          onChange={handleInputChange}
-          placeholder="Add your comment..."
-        />
-        <button type="submit">Post</button>
-      </form>
-      <div className="comments-list">
-        {comments.map((comment, index) => (
-          <div key={index} className="comment">
-            {comment}
-          </div>
-        ))}
-      </div>
+      {songs.map(song => <SongCard key={song.id} song={song} />)}
     </div>
   );
 }
