@@ -5,8 +5,8 @@ import Comment from './Comment';
 function SongCard({song}){
 
     const [songLikes, setSongLikes] = useState(false)
-    const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
+    const [comments, setComments] = useState(song.comments)
 
     const synthRef = useRef(null);
 
@@ -54,12 +54,26 @@ function SongCard({song}){
 
     const handleInputChange = (event) => {
         setNewComment(event.target.value);
+        console.log(newComment)
     };
     
     const handleSubmit = (event) => {
         event.preventDefault();
-        setComments([...comments, newComment]);
-        setNewComment('');
+        fetch('/api/comment', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                comment: newComment,
+                recording_id: song.id
+            })
+        })
+        .then(res => res.json())
+        .then(promise => {
+            setComments([...comments, promise])
+            setNewComment('')
+        })
     };
 
     const handleSongLike = () => {
@@ -96,7 +110,7 @@ function SongCard({song}){
                 <button type="submit">Post</button>
             </form>
             <div className="comments-list">
-                {song.comments.map(current => (
+                {comments.map(current => (
                 <Comment current={current} key={current.id}/>
                 ))}
             </div>
