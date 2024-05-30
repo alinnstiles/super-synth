@@ -167,7 +167,7 @@ def delete_comment(id):
 # post comment
 @app.post('/api/comment')
 def post_comment():
-    user_id = session.get['user_id']
+    user_id = session.get('user_id')
     if not user_id:
         return {"error": "Not logged in"}, 401
     
@@ -177,6 +177,8 @@ def post_comment():
         recording_id = request.json['recording_id'],
         user_id = user_id
     )
+    db.session.add(comment)
+    db.session.commit()
     return comment.to_dict(), 201
 
 if __name__ == '__main__':
