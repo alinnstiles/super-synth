@@ -35,6 +35,7 @@ if __name__ == '__main__':
                 name = faker.name(),
                 likes = randint(1, 500),
                 public = True,
+                selected_instrument = choice(['sine','square','triangle','sawtooth']),
                 user_id = randint(1, 5)
             )
             recordings.append(r1)
