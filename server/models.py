@@ -40,6 +40,7 @@ class Recording(db.Model, SerializerMixin):
     name = db.Column(db.String, nullable=False)
     likes = db.Column(db.Integer, default=0)
     public = db.Column(db.Boolean, default=False)
+    selected_instrument = db.Column(db.String, default="sine")
     time_created = db.Column(db.DateTime, default=datetime.datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users_table.id'))
     
